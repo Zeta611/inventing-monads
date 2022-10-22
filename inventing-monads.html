@@ -1,0 +1,995 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-10-16 Sun 13:11 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>모나드 발명하기</title>
+<meta name="author" content="이재호" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style>*{font-family: sans-serif !important}</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">모나드 발명하기</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org9f94e9c">1. 왜?</a>
+<ul>
+<li><a href="#org0a3a620">1.1. 그래서 모나드가 뭔데?</a></li>
+<li><a href="#org8b44073">1.2. 지금까지 문제 없었는데?</a></li>
+<li><a href="#org0034f92">1.3. 구조적 프로그래밍</a></li>
+<li><a href="#orgb0eafc2">1.4. 우리(프로그래머)를 편하게 해주는 것들</a></li>
+<li><a href="#org52ec3f7">1.5. 모나드</a></li>
+</ul>
+</li>
+<li><a href="#org0f55ad0">2. 발명하기</a>
+<ul>
+<li><a href="#orgbbc6c8b">2.1. 백만불 아끼기</a>
+<ul>
+<li><a href="#orgf91fb98">2.1.1. 문제 상황</a></li>
+<li><a href="#orgec062ae">2.1.2. 해결법</a></li>
+<li><a href="#org4a4c150">2.1.3. 편하게 쓸 수 있게 감싸 보자</a></li>
+<li><a href="#orgf0fbd63">2.1.4. <code>get_classes_from_user(...) -&gt; Packet[...]</code>?!</a></li>
+<li><a href="#org141988b">2.1.5. 까서 합체하자!</a></li>
+</ul>
+</li>
+<li><a href="#org0ac4cf4">2.2. 아마도 모나드 (Maybe Monad)</a>
+<ul>
+<li><a href="#org0e58c32">2.2.1. 잠깐 길을 벗어나서: 문법 설탕</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org053835f">3. 모나드</a>
+<ul>
+<li><a href="#org122a8aa">3.1. 게임의 규칙</a></li>
+<li><a href="#org6a8db80">3.2. 아마도 (Maybe)</a></li>
+<li><a href="#org83e4b50">3.3. 리스트</a></li>
+<li><a href="#orgb977c68">3.4. 비결정성</a></li>
+</ul>
+</li>
+<li><a href="#org7dbd320">4. 마음가짐</a>
+<ul>
+<li><a href="#orgd16a088">4.1. 참고</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="org5090ef8" class="figure">
+<p><img src="./monad.jpeg" alt="monad.jpeg" />
+</p>
+</div>
+
+<div id="outline-container-org9f94e9c" class="outline-2">
+<h2 id="org9f94e9c"><span class="section-number-2">1.</span> 왜?</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org0a3a620" class="outline-3">
+<h3 id="org0a3a620"><span class="section-number-3">1.1.</span> 그래서 모나드가 뭔데?</h3>
+<div class="outline-text-3" id="text-1-1">
+<blockquote>
+<p>
+모나드는 자기 함자 범주에서의 모노이드인데, 뭐가 문제야?
+A monad is a monoid in the category of endofunctors, what's the problem?
+</p>
+</blockquote>
+<p>
+<a href="http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html">http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html</a>
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org8b44073" class="outline-3">
+<h3 id="org8b44073"><span class="section-number-3">1.2.</span> 지금까지 문제 없었는데?</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<div id="org9d1b364" class="figure">
+<p><img src="./faster-horse.jpg" alt="faster-horse.jpg" />
+</p>
+</div>
+<ul class="org-ul">
+<li>과장 조금 (많이) 보태서, 그냥 튜링 머신으로도 문제 없다!</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0034f92" class="outline-3">
+<h3 id="org0034f92"><span class="section-number-3">1.3.</span> 구조적 프로그래밍</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<div id="org464d51c" class="figure">
+<p><img src="./goto.png" alt="goto.png" />
+</p>
+</div>
+
+<blockquote>
+<p>
+&#x2026; 우리의 지력은 정적인 관계를 파악하는데에 적합하지, 시간에 따라 과정이 어떻게 흘러가는지 시각화하는 것에는 다소 약하다. &#x2026;
+</p>
+<ul class="org-ul">
+<li>에츠허르 W. 다익스트라, "Go To문의 해로움에 관하여"</li>
+</ul>
+<p>
+&#x2026; our intellectual powers are rather geared to master static relations and that our powers to visualize processes evolving in time are relatively poorly developed. &#x2026;
+</p>
+<ul class="org-ul">
+<li>Edsger W. Dijkstra in "Go To Statement Considered Harmful"</li>
+</ul>
+</blockquote>
+
+<ul class="org-ul">
+<li>한 단계 위에서 이해하기
+<ul class="org-ul">
+<li>기계의 조종이라는 개념이 아니라, 논리적인 구조를 기반으로 사고</li>
+</ul></li>
+<li>사실 제약은 '기능'
+<ul class="org-ul">
+<li>프로그래밍 언어는 우리에게서 자유도를 빼앗아가며 발전</li>
+<li>Lisp (1950): 조건문, 일급 시민인 함수 (+재귀), 쓰레기 처리</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgb0eafc2" class="outline-3">
+<h3 id="orgb0eafc2"><span class="section-number-3">1.4.</span> 우리(프로그래머)를 편하게 해주는 것들</h3>
+<div class="outline-text-3" id="text-1-4">
+<ul class="org-ul">
+<li>문법 설탕도 우리의 삶을 윤택하게 해주지만, 깊이가 매우 얕음
+<ul class="org-ul">
+<li>쉽지만 상당수는 작은 이득만을 가져다 줌</li>
+</ul></li>
+<li>반면 더 깊은 수준에서 우리를 도와주는 도구들도 있음: 타입 이론, 쓰레기 처리기, 구조적 동시성, &#x2026;
+<ul class="org-ul">
+<li>하지만 프로그래머에게 일정 수준 이상의 공부와 규율을 요구함</li>
+<li>매우 큰 보상을 줌</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org52ec3f7" class="outline-3">
+<h3 id="org52ec3f7"><span class="section-number-3">1.5.</span> 모나드</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+"계산이란 무엇인가?"
+</p>
+<ul class="org-ul">
+<li>사실은 순수한 프로그래밍 언어인 하스켈의 입출력을 위해서 프로그래밍 세계에 실제로 도입됨</li>
+<li>프로그램 실행의 관점에서 다른 방향의 고수준 생각을 열어줌</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0f55ad0" class="outline-2">
+<h2 id="org0f55ad0"><span class="section-number-2">2.</span> 발명하기</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+일단은 실용적인 방향으로&#x2026;
+</p>
+</div>
+
+<div id="outline-container-orgbbc6c8b" class="outline-3">
+<h3 id="orgbbc6c8b"><span class="section-number-3">2.1.</span> 백만불 아끼기</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+The Billion Dolloar Mistake:
+<a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/">https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/</a>
+</p>
+</div>
+
+<div id="outline-container-orgf91fb98" class="outline-4">
+<h4 id="orgf91fb98"><span class="section-number-4">2.1.1.</span> 문제 상황</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+사용자별로 시간표 하나씩 있고, 시간표를 확인하여 수업들을 볼 수 있는 구조:
+</p>
+<div class="org-src-container">
+<pre class="src src-python">class User:
+    def __init__(self, name, timetable_id):
+        self.name = name
+        self.timetable_id = timetable_id
+
+class Timetable:
+    def __init__(self, name, classes):
+        self.name = name
+        self.classes = classes
+
+USERS = {
+    "c9f4ad09-3a57-449e-9303-39fc618ba4a8": User(
+        "jay",
+        "bd96da54-5202-4e74-947d-a68c6e50c941"
+    ),
+}
+
+TIMETABLES = {
+    "bd96da54-5202-4e74-947d-a68c6e50c941": Timetable(
+        "2022 Fall",
+        ["class 1", "class 2"]
+    ),
+}
+</pre>
+</div>
+
+<p>
+사용자의 ID를 통해 수업들을 확인할 수 있도록 돕는 함수들:
+</p>
+<div class="org-src-container">
+<pre class="src src-python">def get_user(user_id):
+    return USERS[user_id]
+
+def get_timetable(user):
+    return TIMETABLES[user.timetable_id]
+
+def get_classes(timetable):
+    return timetable.classes
+
+uid = "c9f4ad09-3a57-449e-9303-39fc618ba4a8"
+print(f"{get_classes(get_timetable(get_user(uid))) = }")
+</pre>
+</div>
+
+<p>
+만약 없는 사용자의 ID를 넣어준다면?
+</p>
+<div class="org-src-container">
+<pre class="src src-python">uid2 = "63a212d5-11e9-4bee-80de-c1d2c12f0478"
+try:
+    print(get_classes(get_timetable(get_user(uid2))))
+except:
+    import traceback
+    traceback.print_exc()
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgec062ae" class="outline-4">
+<h4 id="orgec062ae"><span class="section-number-4">2.1.2.</span> 해결법</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<ul class="org-ul">
+<li>예외 사용하기</li>
+</ul>
+<p>
+파이썬을 포함한 현대적인 프로그래밍 언어들에 모두 들어간 예외를 사용해 처리 가능!
+</p>
+<div class="org-src-container">
+<pre class="src src-python">try:
+    classes = get_classes(get_timetable(get_user(uid2)))
+except:
+    classes = None
+print(classes)
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>타입 수준에서 해결: <code>Optional</code> 사용하기 (<code>T | None = Optional[T]</code>)
+<ul class="org-ul">
+<li>안전한 함수들을 만들자</li>
+</ul></li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-python">def get_user_safe(user_id: str) -&gt; User | None:
+    return USERS.get(user_id)
+
+def get_timetable_safe(user: User) -&gt; list[str] | None:
+    return TIMETABLES.get(user.timetable_id)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">try:
+    # 바로 이렇게는 사용하지 못하지만...
+    print(get_classes(get_timetable_safe(get_user_safe(uid2))))
+except:
+    import traceback
+    traceback.print_exc()
+</pre>
+</div>
+
+<p>
+복잡하긴 하지만 이렇게 사용 가능:
+</p>
+<div class="org-src-container">
+<pre class="src src-python">def safe_call(user_id):
+    user = get_user_safe(user_id)
+    if user is None:
+        return None
+    timetable = get_timetable_safe(user)
+    if timetable is None:
+        return None
+    return get_classes(timetable)
+
+
+print(f"{safe_call(uid) = }")
+print(f"{safe_call(uid2) = }")
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4a4c150" class="outline-4">
+<h4 id="org4a4c150"><span class="section-number-4">2.1.3.</span> 편하게 쓸 수 있게 감싸 보자</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<div class="org-src-container">
+<pre class="src src-python">from typing import TypeVar, Callable, Generic
+
+T = TypeVar("T")
+U = TypeVar("U")
+
+class Packet(Generic[T]):
+    def __init__(self, payload: T | None):
+        self.payload = payload
+
+    def if_exists(self, f: Callable[[T], U | None]) -&gt; "Packet[U]":
+        if self.payload is None:
+            return self
+        return Packet(f(self.payload))
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">def get_classes_from_user(user_id):
+    return Packet(get_user_safe(user_id)) \
+        .if_exists(get_timetable_safe) \
+        .if_exists(get_classes)
+
+
+print(get_classes_from_user(uid).payload)
+print(get_classes_from_user(uid2).payload)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf0fbd63" class="outline-4">
+<h4 id="orgf0fbd63"><span class="section-number-4">2.1.4.</span> <code>get_classes_from_user(...) -&gt; Packet[...]</code>?!</h4>
+<div class="outline-text-4" id="text-2-1-4">
+<p>
+<code>Packet</code> 을 돌려주는 다른 함수와는 <code>if_exists</code> 로 감싸면 계속 <code>Packet</code> 으로 감싸지는데&#x2026;
+</p>
+<div class="org-src-container">
+<pre class="src src-python">class ClassCounterService:
+    def __init__(self):
+        return
+
+    def count_classes(self, classes: list[str]) -&gt; Packet[int]:
+        return Packet(len(classes))
+
+SHARED_CLASS_COUNTER = ClassCounterService()
+
+def get_class_count(classes: list[str]) -&gt; Packet[int]:
+    return SHARED_CLASS_COUNTER.count_classes(classes)
+
+class_cnt = get_classes_from_user(uid).if_exists(get_class_count)
+print(f"{type(class_cnt) = }")
+print(f"{type(class_cnt.payload) = }")
+print(f"{type(class_cnt.payload.payload) = }")
+print(f"{class_cnt.payload.payload = }")
+</pre>
+</div>
+
+
+<div id="org0ee6805" class="figure">
+<p><img src="./matroshka.jpg" alt="matroshka.jpg" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org141988b" class="outline-4">
+<h4 id="org141988b"><span class="section-number-4">2.1.5.</span> 까서 합체하자!</h4>
+<div class="outline-text-4" id="text-2-1-5">
+<div class="org-src-container">
+<pre class="src src-python">class Packet(Generic[T]):
+  def __init__(self, payload: T | None):
+      self.payload = payload
+
+  def if_exists(self, f: Callable[[T], U | None]) -&gt; "Packet[U]":
+      if self.payload is None:
+          return self
+      return Packet(f(self.payload))
+
+  def if_exists_coalesce(self, f: Callable[[T], "Packet[U]"]) -&gt; "Packet[U]":
+      if self.payload is None:
+          return self
+      return f(self.payload)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">def get_classes_from_user(user_id):
+    return Packet(get_user_safe(user_id)) \
+        .if_exists(get_timetable_safe) \
+        .if_exists(get_classes)
+
+class ClassCounterService:
+    def __init__(self):
+        return
+
+    def count_classes(self, classes: list[str]) -&gt; Packet[int]:
+        return Packet(len(classes))
+
+SHARED_CLASS_COUNTER = ClassCounterService()
+
+def get_class_count(classes: list[str]) -&gt; Packet[int]:
+    return SHARED_CLASS_COUNTER.count_classes(classes)
+
+class_cnt = get_classes_from_user(uid).if_exists_coalesce(get_class_count)
+print(f"{type(class_cnt) = }")
+print(f"{type(class_cnt.payload) = }")
+print(f"{class_cnt.payload = }")
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0ac4cf4" class="outline-3">
+<h3 id="org0ac4cf4"><span class="section-number-3">2.2.</span> 아마도 모나드 (Maybe Monad)</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+그냥 (Just) 값이 들어있거나 없거나 (Nothing).
+</p>
+
+<p>
+위의 <code>Packet</code> 이 아마도 모나드!
+</p>
+<ul class="org-ul">
+<li><code>__init__</code> 으로 <code>T</code> 를 감쌀 수 있고("return"), <code>if_exists_coalesce</code> 로 다른 아마도 모나드 (<code>Packet</code>)를 돌려주는 함수와 이을 수 있다("bind").</li>
+</ul>
+</div>
+
+<div id="outline-container-org0e58c32" class="outline-4">
+<h4 id="org0e58c32"><span class="section-number-4">2.2.1.</span> 잠깐 길을 벗어나서: 문법 설탕</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+문법 설탕을 통해서 모나드를 자연스럽게 사용할 수 있다.
+</p>
+
+<p>
+대입도 문법 설탕!
+</p>
+<div class="org-src-container">
+<pre class="src src-python">a = 1
+b = a * 2
+c = 3
+print(a + b + c)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">(lambda a:
+ (lambda b:
+  (lambda c:
+   print(a + b + c)
+   )(3)
+  )(a * 2)
+ )(1)
+</pre>
+</div>
+
+<p>
+즉, <code>~x = y \n ... ~</code> 은 사실 함수 적용의 문법 설탕
+</p>
+
+<p>
+<b>이하는 유사-파이썬 코드입니다.</b>
+</p>
+</div>
+<ol class="org-ol">
+<li><a id="orga31dd37"></a>1단계 문법 설탕<br />
+<div class="outline-text-5" id="text-2-2-1-1">
+<p>
+중위 연산자 정의가 가능한 언어라면 다음과 같이 "="을 만들어낼 수 있다.
+</p>
+<pre class="example">
+1 &gt;&gt;= (lambda a:
+  a * 2 &gt;&gt;= (lambda b:
+    3 &gt;&gt;= (lambda c:
+      print(a + b + c)
+    )
+  )
+)
+</pre>
+</div>
+</li>
+
+<li><a id="orgd0f0e5f"></a>2단계 문법 설탕<br />
+<div class="outline-text-5" id="text-2-2-1-2">
+<p>
+";"을 갈아끼울 수 있는 언어라면 다음과 같이 "="을 만들어낼 수 있다.
+</p>
+<div class="org-src-container">
+<pre class="src src-python">a = 1;
+b = a * 2;
+c = 3;
+print(a + b + c)
+</pre>
+</div>
+</div>
+</li>
+
+<li><a id="org99ec4bc"></a>아마도 모나드의 의미로 "="을 갈아끼우자<br />
+<div class="outline-text-5" id="text-2-2-1-3">
+<p>
+"C1; C2"은 "C1"를 한 후 "C2"를 하라는 의미인데, 이 의미를 갈아끼우는 것!
+</p>
+</div>
+
+<ol class="org-ol">
+<li><a id="org3a15ddf"></a>Haskell<br />
+<div class="outline-text-6" id="text-2-2-1-3-1">
+<div class="org-src-container">
+<pre class="src src-haskell">do a &lt;- Just 1
+   b &lt;- Just (a * 2)
+   c &lt;- Just 3
+   return (a + b + c)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-haskell">1 &gt;&gt;= \a -&gt;
+a * 2 &gt;&gt;= \b -&gt;
+</pre>
+</div>
+</div>
+</li>
+<li><a id="org0b42df0"></a>OCaml<br />
+<div class="outline-text-6" id="text-2-2-1-3-2">
+<div class="org-src-container">
+<pre class="src src-ocaml">let* a = Some 1 in
+let* b = Some (a * 2) in
+let* c = Some 3 in
+return (a + b + c)
+</pre>
+</div>
+
+<p>
+일반적인 대입과 비교하면 의미심장하다:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml">let a = 1 in
+let b = a * 2 in
+let c = 3 in
+a + b + c
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org053835f" class="outline-2">
+<h2 id="org053835f"><span class="section-number-2">3.</span> 모나드</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>모기(Moggi): \(f: A \to B\) 처럼 생긴 "함수"는 사실 수학적인 함수가 아니라, \(f: A \to M\,B\) 인 수학적인 함수로 표현 가능
+<ul class="org-ul">
+<li>\(A\) 라는 타입의 값과 \(M\ A\) 라는 타입의 "계산"을 분리</li>
+</ul></li>
+<li>예시
+<ol class="org-ol">
+<li>부분 정의: \(M\,A = A_\bot\)</li>
+<li>비결정성: \(M\,A = \wp(A)\)</li>
+<li>부작용: \(M\,A = S \to A \times S\)</li>
+<li>예외: \(M\,A = A + E\)</li>
+</ol></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python">def babo_factorial(n: int) -&gt; int:
+    return random(1, n)
+
+# 2^int = {{}, {1, 2}, ..., {1}, {1, ..., n}}
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org122a8aa" class="outline-3">
+<h3 id="org122a8aa"><span class="section-number-3">3.1.</span> 게임의 규칙</h3>
+<div class="outline-text-3" id="text-3-1">
+<ul class="org-ul">
+<li><code>bind: 'a t -&gt; ('a -&gt; 'b t) -&gt; 'b t</code> 와 <code>return: 'a -&gt; 'a t</code> 의 구현
+<ul class="org-ul">
+<li>언어별로 타입을 조금씩 다르게 표현: <code>'a t</code> OCaml, <code>t&lt;a&gt;</code> TypeScript/C++/Swift/ReScript/&#x2026;, <code>t[a]</code> Python, <code>t a</code> Haskell/Elm/&#x2026;</li>
+</ul></li>
+<li>모나드 법칙
+<ol class="org-ol">
+<li><code>bind(return(o), f) == f(o)</code>
+<ul class="org-ul">
+<li>Python 등 OOP 언어에서는 <code>return(o).bind(f)</code> 와 같이 읽으면 된다</li>
+</ul></li>
+<li><code>bind(m, return) == m</code>
+<ul class="org-ul">
+<li>마찬가지로 <code>m.bind(return)</code></li>
+</ul></li>
+<li><code>bind(bind(m, f), g) = bind(m, lambda a: bind(f(a), g))</code>
+<ul class="org-ul">
+<li><code>m.bind(f).bind(g) = m.bind(lambda a: f(a).bind(g))</code></li>
+<li>이게 무슨 의미인지는 아래 <a href="#org547bf38">비결정성</a>에서 확인</li>
+</ul></li>
+</ol></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6a8db80" class="outline-3">
+<h3 id="org6a8db80"><span class="section-number-3">3.2.</span> 아마도 (Maybe)</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+파이썬은 타입이 명시적으로 드러나지 않으므로 정적 타입 언어로 다시 정리하자면:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml">(* type 'a option = None | Some of 'a (* Built-in *) *)
+let return (x : 'a) : 'a option = Some x
+let bind (o : 'a option) (f : 'a -&gt; 'b option) : 'b option = match o with
+| None -&gt; None
+| Some x -&gt; f x
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org83e4b50" class="outline-3">
+<h3 id="org83e4b50"><span class="section-number-3">3.3.</span> 리스트</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+<pre class="src src-ocaml">(* type 'a list = [] | (::) of 'a * 'a list (* Built-in *) *)
+let return (x : 'a) : 'a list = [ x ]
+let bind (o : 'a list) (f : 'a -&gt; 'b list) : 'b list = List.concat_map f o
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">class ListMonad(Generic[T]):
+  def __init__(self, lst: list[T]):
+      self.lst = lst
+      # ListMonad([x])
+
+  def bind(self, f: Callable[[T], list[U]]) -&gt; list[U]:
+      return ListMonad([y for x in self.lst for y in f(x).lst])  # ?!
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python">nums = ListMonad([1, 2, 3])
+print(nums.bind(lambda x: ListMonad([x, x * 2, x * 3]) if x % 2 == 0 else ListMonad([])).lst)
+print(f"{[a for x in [1, 2, 3] if x % 2 == 0 for a in [x, x * 2, x * 3]] = }")
+</pre>
+</div>
+
+<p>
+한 겹의 괄호에 리스트를 주는 for-식이 들어가는 것은 사실상 모나드를 사용한 코드이다!
+</p>
+
+<p>
+하지만 리스트 표현식의 한계는 다음 OCaml 코드의 가독성에서 확인할 수 있다:
+</p>
+<div class="org-src-container">
+<pre class="src src-ocaml">let ( let* ) = bind
+
+let result =
+  List.concat_map (fun x -&gt;
+    if x mod ....
+  ) [1; 2; 3]
+  (* let* x = [1; 2; 3] in
+   * if x mod 2 = 0 then
+   *   [x; x * 2; x * 3]
+   * else
+   *   [] *)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb977c68" class="outline-3">
+<h3 id="orgb977c68"><span class="section-number-3">3.4.</span> 비결정성</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+<a id="org547bf38"></a>
+비결정적인 프로그램의 "의미(semantics)"를 리스트로 표현 가능
+</p>
+<div class="org-src-container">
+<pre class="src src-python"># Inspired by https://stackoverflow.com/a/20644753
+import enum
+
+class CoinType(enum.Enum):
+    FAIR = enum.auto()
+    BIASED = enum.auto()
+
+class Coin(enum.Enum):
+    HEAD = enum.auto()
+    TAIL = enum.auto()
+
+def toss(coin: CoinType) -&gt; Coin:
+    match coin:
+        case CoinType.FAIR:
+            return ListMonad(list(Coin)) # [HEAD, TAIL]
+        case CoinType.BIASED:
+            return ListMonad([Coin.HEAD, Coin.HEAD])
+
+def pick():
+    return ListMonad(list(CoinType)) # [FAIR, BIASED]
+
+# print(pick().bind(lambda coin: toss(coin)).bind(lambda result: ListMonad([result] if result == Coin.HEAD else [])).lst)
+print(pick().bind(lambda coin:
+    toss(coin).bind(lambda result:
+        # `coin` is now in scope here!
+        # See the monad law 3 in action
+        ListMonad([coin] if result == Coin.HEAD else []))
+    ).lst
+)
+</pre>
+</div>
+
+<ol class="org-ol">
+<li><code>bind(bind(m, f), g) = bind(m, lambda a: bind(f(a), g))</code>
+<ul class="org-ul">
+<li><code>m.bind(f).bind(g) = m.bind(lambda a: f(a).bind(g))</code></li>
+<li>이게 무슨 의미인지는 아래 <a href="#org547bf38">비결정성</a>에서 확인</li>
+</ul></li>
+</ol>
+
+
+<p>
+이거 그냥 map으로는 안되나? -&gt; [] 때문에 안 됨
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7dbd320" class="outline-2">
+<h2 id="org7dbd320"><span class="section-number-2">4.</span> 마음가짐</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>명령형 프로그래밍에서의 함수 \(f: A \to B\) 는 수학적으로는 적절한 모나드 $M$에 대한 \(f: A \to M\,B\) 으로 항상 나타낼 수 있다.</li>
+<li>리스트 연산을 할 때, 중첩된 map과 flatmap, filter를 난발하기 전에 한 발짝 물러서서 내가 지금 무엇을 하고 있는지 타입 수준에서 생각해보자.
+<ul class="org-ul">
+<li>[1, 2, 3] -&gt; [[1], [], [3, 6]] -&gt; [1, 3, 6]</li>
+<li>[1, 2, 3] =&gt; 1 -&gt; [1], 2 -&gt; [], 3 -&gt; [3, 6]</li>
+<li>M A, "A"</li>
+</ul></li>
+<li>None이 될 수 있는 타입(옵션, 옵셔널, 널러블, &#x2026;)에 대한 연산, 리스트의 연산, 프로미스의 연산, 예외를 뱉는 연산은 모두 동일한 방식의 변환을 사용한다.</li>
+<li>Python의 리스트 표현식, Swift의 flatMap과 Optional에 관한 <code>??</code>, <code>?.</code>, <code>if let</code> 등의 문법 설탕 등등 특정 모나드에 대한 조준 사격이 사실은 일반화 가능하다.</li>
+<li>모나드는 "세미콜론"의 일반화이다.</li>
+<li>모나드는 자기 함자 범주에서의 모노이드인데, 뭐가 문제야?</li>
+</ul>
+</div>
+
+<div id="outline-container-orgd16a088" class="outline-3">
+<h3 id="orgd16a088"><span class="section-number-3">4.1.</span> 참고</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+<a href="https://github.com/Zeta611/L/commit/68cd96611a4ac719a21ee4dcb09d9c16def7edbf">https://github.com/Zeta611/L/commit/68cd96611a4ac719a21ee4dcb09d9c16def7edbf</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 10/16/22</p>
+<p class="author">Author: 이재호</p>
+<p class="date">Created: 2022-10-16 Sun 13:11</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
