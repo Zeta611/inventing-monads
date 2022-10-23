@@ -52,7 +52,7 @@ http://james-iry.blogspot.com/2009/05/brief-incomplete-and-mostly-wrong.html
 일단은 실용적인 방향으로...
 
 ** 백만불 아끼기
-The Billion Dolloar Mistake:
+The Billion Dollar Mistake:
 https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/
 
 *** 문제 상황
